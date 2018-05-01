@@ -1,0 +1,7 @@
+[package]
+name = "dank_fractals"
+version = "0.1.0"
+authors = ["Luca Bertozzi <lucabertozzi.pub@gmail.com>"]
+
+[dependencies]
+glium = "*"
