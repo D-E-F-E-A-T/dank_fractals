@@ -10,6 +10,23 @@ mod view;
 
 mod math {
 
+    pub fn clamp(value: &mut f32, min: f32, max: f32) {
+        lower_clamp(value, min);
+        upper_clamp(value, max);
+    }
+
+    pub fn lower_clamp(value: &mut f32, min: f32) {
+        if *value < min {
+            *value = min;
+        }
+    }
+
+    pub fn upper_clamp(value: &mut f32, max: f32) {
+        if *value > max {
+            *value = max;
+        }
+    }
+
     pub trait HasLength {
 
         fn length(&self) -> f32;
@@ -39,7 +56,8 @@ struct Vertex {
 }
 implement_vertex!(Vertex, position);
 
-const CAMERA_SPEED: f32 = 0.01; //units / sec
+const CAMERA_SPEED: f32 = 5.0; //units / sec
+const CAMERA_ZOOM_UNIT: f32 = 0.1;
 
 fn main() {
     let mut view = view::WindowView::new(1024, 767);
@@ -124,6 +142,7 @@ fn main() {
 
         //do updates that require delta time here
         camera.translate(move_direction.0 * CAMERA_SPEED * elapsed, move_direction.1 * CAMERA_SPEED * elapsed);
+        camera.zoom(mouse_wheel_input * CAMERA_ZOOM_UNIT);
 
     }
 

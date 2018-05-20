@@ -9,7 +9,7 @@ uniform float screen_height;
 out vec4 color;
 
 vec2 map_frag_to_complex_plane(vec2 fragCoord) {
-    return (fragCoord / screen_height * 4.0 - 2.0) / cam_zoom - cam_position;
+    return ((fragCoord / screen_height * 4.0 - 2.0) / cam_zoom) - cam_position;
 }
 
 void main() {

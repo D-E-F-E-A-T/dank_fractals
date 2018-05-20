@@ -32,12 +32,15 @@ impl Camera {
     }
 
     pub fn translate(&mut self, x: f32, y: f32) {
-        self.position.0 += x;
-        self.position.1 += y;
+        self.position.0 += x / self.zoom;
+        self.position.1 += y / self.zoom;
     }
 
-    pub fn zoom(&mut self, scale: f32) {
-        self.zoom *= scale;
+    pub fn zoom(&mut self, mouse_input: f32) {
+        use math::lower_clamp;
+
+        self.zoom += mouse_input;
+        lower_clamp(&mut self.zoom, 0.5);
     }
 
     pub fn get_position(&self) -> [f32; 2] {
