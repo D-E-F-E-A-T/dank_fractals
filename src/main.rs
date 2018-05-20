@@ -4,7 +4,7 @@ extern crate glium;
 use glium::{Surface, Display};
 use glium::glutin::{ContextBuilder, EventsLoop, WindowBuilder, WindowEvent, Event, VirtualKeyCode, MouseScrollDelta};
 use std::time::{Instant, Duration};
-use math::HasLength;
+use math::{HasLength, Vec2};
 
 mod view;
 
@@ -27,24 +27,34 @@ mod math {
         }
     }
 
+    pub fn zoom_scale_function(zoom: f32) -> f32 {
+        (zoom + 1.0).log2() + (zoom)
+    }
+
     pub trait HasLength {
 
         fn length(&self) -> f32;
         fn normalize(&self) -> Self;
     }
 
-    impl HasLength for (f32, f32) {
+    #[derive(Copy, Clone)]
+    pub struct Vec2 {
+        pub x: f32,
+        pub y: f32,
+    }
+
+    impl HasLength for Vec2 {
 
         fn length(&self) -> f32 {
-            (self.0 * self.0 + self.1 * self.1).sqrt()
+            (self.x * self.x + self.y * self.y).sqrt()
         }
 
-        fn normalize(&self) -> (f32, f32) {
+        fn normalize(&self) -> Vec2 {
             let len = self.length();
             if len == 0.0 {
-                *self
+                self.clone()
             } else {
-                (self.0 / len, self.1 / len)
+                Vec2 { x: self.x / len, y: self.y / len }
             }
         }
     }
@@ -93,7 +103,7 @@ fn main() {
     while running {
         let then = Instant::now();
 
-        let mut move_direction: (f32, f32) = (0.0, 0.0);
+        let mut move_direction = Vec2 { x: 0.0, y: 0.0 };
         let mut mouse_wheel_input: f32 = 0.0;
 
         let mut target = display.draw();
@@ -119,10 +129,10 @@ fn main() {
                     },
                     ..
                 } => match kc {
-                    VirtualKeyCode::W => move_direction.1 +=  1.0,
-                    VirtualKeyCode::A => move_direction.0 += -1.0,
-                    VirtualKeyCode::S => move_direction.1 += -1.0,
-                    VirtualKeyCode::D => move_direction.0 +=  1.0,
+                    VirtualKeyCode::W => move_direction.y += -1.0,
+                    VirtualKeyCode::A => move_direction.x +=  1.0,
+                    VirtualKeyCode::S => move_direction.y +=  1.0,
+                    VirtualKeyCode::D => move_direction.x += -1.0,
                     _ => (),
                 },
                 WindowEvent::MouseWheel {
@@ -141,7 +151,7 @@ fn main() {
         let elapsed = (duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9) as f32;
 
         //do updates that require delta time here
-        camera.translate(move_direction.0 * CAMERA_SPEED * elapsed, move_direction.1 * CAMERA_SPEED * elapsed);
+        camera.translate(move_direction.x * CAMERA_SPEED * elapsed, move_direction.y * CAMERA_SPEED * elapsed);
         camera.zoom(mouse_wheel_input * CAMERA_ZOOM_UNIT);
 
     }

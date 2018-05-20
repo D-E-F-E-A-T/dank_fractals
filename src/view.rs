@@ -1,3 +1,4 @@
+use math::Vec2;
 
 pub struct WindowView {
     pub width: u32,
@@ -7,8 +8,8 @@ pub struct WindowView {
 impl WindowView {
     pub fn new(width: u32, height: u32) -> WindowView {
         WindowView {
-            width: width,
-            height: height,
+            width,
+            height,
         }
     }
 
@@ -19,31 +20,32 @@ impl WindowView {
 }
 
 pub struct Camera {
-    pub position: (f32, f32),
+    pub position: Vec2,
     pub zoom: f32,
 }
 
 impl Camera {
     pub fn new() -> Camera {
         Camera {
-            position: (0.0, 0.0),
+            position: Vec2 { x: 0.0, y: 0.0 },
             zoom: 1.0,
         }
     }
 
     pub fn translate(&mut self, x: f32, y: f32) {
-        self.position.0 += x / self.zoom;
-        self.position.1 += y / self.zoom;
+        self.position.x += x / self.zoom;
+        self.position.y += y / self.zoom;
     }
 
     pub fn zoom(&mut self, mouse_input: f32) {
-        use math::lower_clamp;
+        use math::{lower_clamp, zoom_scale_function};
 
-        self.zoom += mouse_input;
+        let scale = zoom_scale_function(self.zoom);
+        self.zoom += (mouse_input * scale);
         lower_clamp(&mut self.zoom, 0.5);
     }
 
     pub fn get_position(&self) -> [f32; 2] {
-        [self.position.0, self.position.1]
+        [self.position.x, self.position.y]
     }
 }
